@@ -38,6 +38,10 @@ screenshot() { adb exec-out screencap -p > "$OUT/$1.png" || true; }
 alive() { adb shell pidof "$PKG" >/dev/null; }
 fail() { echo "HATA: $1"; adb logcat -d > "$OUT/logcat.txt" || true; exit 1; }
 
+SIZE="$(adb shell wm size | grep -o '[0-9]*x[0-9]*' | tail -1)"
+W="${SIZE%x*}"; H="${SIZE#*x}"
+swipe_up() { adb shell input swipe $((W / 2)) $((H * 4 / 5)) $((W / 2)) $((H / 4)) 300; sleep 1; }
+
 echo "Kuruluyor: $APK"
 adb install -r "$APK"
 adb logcat -c
@@ -49,9 +53,9 @@ screenshot 01-karsilama
 has_text "90Max" || fail "Karşılama ekranı görünmedi"
 
 # Karşılama ekranını aşağı kaydırıp programı başlat
-for i in 1 2 3 4 5 6; do
+for i in 1 2 3 4 5 6 7 8; do
   if has_text "Programı başlat"; then break; fi
-  adb shell input swipe 500 1500 500 400 300; sleep 1
+  swipe_up
 done
 tap_text "Programı başlat" || fail "'Programı başlat' düğmesi bulunamadı"
 sleep 3

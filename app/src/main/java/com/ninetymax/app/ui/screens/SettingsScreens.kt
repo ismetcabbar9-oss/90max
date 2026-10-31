@@ -5,6 +5,8 @@ import android.provider.Settings as AndroidSettings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -229,8 +231,12 @@ fun OnboardingScreen() {
     var startDate by remember { mutableStateOf(today()) }
     var equipment by remember { mutableStateOf(data.settings.equipment) }
     Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxSize().systemBarsPadding().imePadding(), horizontalAlignment = Alignment.CenterHorizontally) {
-            ScreenColumn(Modifier.widthIn(max = 640.dp)) {
+        // Tüm ekran kaydırılabilir; geniş ekranda içerik ortada 640 dp genişlikte kalır.
+        Column(
+            Modifier.fillMaxSize().systemBarsPadding().imePadding().verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Column(Modifier.widthIn(max = 640.dp).padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 Spacer(Modifier.height(12.dp))
                 Text("90Max", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
                 Text("90 günlük kişisel gelişim ve görünüm programın", style = MaterialTheme.typography.titleMedium)
