@@ -2,6 +2,7 @@ package com.ninetymax.app.data
 
 import com.ninetymax.app.seed.Seed
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,12 +36,14 @@ class Repository(
     private val dataFile = File(dir, "data.json")
     private val backupDir = File(dir, "backups")
     private val writeLock = Mutex()
-    private val _state = MutableStateFlow(load())
-    val state: StateFlow<AppData> = _state.asStateFlow()
+    @Volatile private var lastWrite: Job? = null
 
-    /** Son yüklemede ana dosya yerine yedekten kurtarma yapıldıysa true. */
+    /** Son yüklemede ana dosya yerine yedekten kurtarma yapıldıysa true. (load()'dan önce tanımlı olmalı.) */
     var recoveredFromBackup = false
         private set
+
+    private val _state = MutableStateFlow(load())
+    val state: StateFlow<AppData> = _state.asStateFlow()
 
     val photoDir: File get() = File(dir, "photos").apply { mkdirs() }
 
@@ -67,17 +70,20 @@ class Repository(
 
     fun update(transform: (AppData) -> AppData) {
         _state.update(transform)
-        val snapshot = _state.value
-        scope.launch { persist(snapshot) }
+        lastWrite = scope.launch { persist() }
     }
 
     /** Durumu tamamen değiştirir (içe aktarma). */
     fun replaceAll(data: AppData) = update { Seed.apply(data, today()) }
 
-    suspend fun flush() = persist(_state.value)
+    /** Sıradaki tüm yazmaların bitmesini bekler ve son durumu diske yazar. */
+    suspend fun flush() {
+        lastWrite?.join()
+        persist()
+    }
 
-    private suspend fun persist(snapshot: AppData) = writeLock.withLock {
-        // Daha yeni bir durum varsa eskisini yazmaya gerek yok.
+    private suspend fun persist() = writeLock.withLock {
+        // Her yazma en güncel durumu kaydeder; Mutex sırayı korur.
         val latest = _state.value
         val text = AppJson.encodeToString(AppData.serializer(), latest)
         writeAtomic(dataFile, text)
