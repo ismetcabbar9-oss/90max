@@ -1,0 +1,25 @@
+90MAX - KURULUM
+================
+
+Gereksinim: Android 8.0 veya üzeri telefon ya da tablet.
+
+1) Bu ZIP dosyasını telefonuna/tabletine indir ve aç (Dosyalar uygulaması ZIP'i açabilir).
+2) İçindeki "90Max.apk" dosyasına dokun.
+3) "Bilinmeyen uygulamaları yükle" izni istenirse: Ayarlar'a git, indirdiğin
+   uygulamaya (ör. Chrome veya Dosyalar) "Bu kaynaktan izin ver" seçeneğini aç, geri dön.
+4) "Yükle"ye dokun. Play Protect uyarı verirse "Yine de yükle"yi seç
+   (uygulama Play Store dışından yüklendiği için bu uyarı normaldir).
+5) 90Max'i aç, bilgilerini gir ve "Programı başlat"a dokun.
+6) Hatırlatmalar için bildirim iznine "İzin ver" de.
+
+GÜNCELLEME
+- Yeni sürümü aynı şekilde kurarsın; verilerin korunur.
+- Sürüm notlarında "geçici anahtar" uyarısı varsa: önce uygulamada
+  Ayarlar > Yedekleme ve veri > Dışa aktar ile yedek al, eski sürümü kaldır,
+  yenisini kur, sonra İçe aktar ile yedeği geri yükle.
+
+VERİLERİN
+- Tüm veriler yalnızca cihazında saklanır, internet gerekmez.
+- Her gün otomatik yerel yedek alınır. Telefon değiştirirken ZIP yedeğini dışa aktar.
+
+Bu uygulama genel bilgilendirme amaçlıdır; tıbbi tavsiye yerine geçmez.

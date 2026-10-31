@@ -1,0 +1,261 @@
+package com.ninetymax.app.seed
+
+import com.ninetymax.app.data.Product
+import com.ninetymax.app.data.ProductCategory
+import com.ninetymax.app.data.ProductCategory.*
+import com.ninetymax.app.data.Timing
+import java.net.URLEncoder
+
+/**
+ * Başlangıç kataloğu. Ürünler Türkiye'de eczane, kozmetik mağazaları veya büyük e-ticaret
+ * sitelerinde yaygın olarak bulunan gerçek ürünlerdir. Fiyatlar sık değiştiği ve uygulama
+ * içinden doğrulanamadığı için katalogda fiyat UYDURULMAMIŞTIR: tahmini fiyat alanı boştur,
+ * kullanıcı kontrol ettiği fiyatı ve tarihini kendisi girer. Bağlantılar ürün sayfası değil,
+ * fiyat karşılaştırma sitesinde arama sonucudur.
+ */
+object ProductCatalog {
+    fun searchLink(query: String): String =
+        "https://www.akakce.com/arama/?q=" + URLEncoder.encode(query, "UTF-8")
+
+    private fun p(
+        id: String, name: String, brand: String, category: ProductCategory, purpose: String, howTo: String,
+        frequency: String, timing: Timing, warnings: String, alternatives: List<String> = emptyList(),
+        dailyTracking: Boolean = false, dose: String = "",
+    ) = Product(
+        id = id, name = name, brand = brand, category = category, purpose = purpose, howTo = howTo,
+        frequency = frequency, timing = timing, warnings = warnings, alternativeIds = alternatives,
+        link = searchLink("$brand $name"), dailyTracking = dailyTracking, dose = dose,
+    )
+
+    private const val PATCH = "İlk kullanımdan önce kulak arkası veya çene kenarında 24-48 saat yama testi yap."
+
+    val products: List<Product> = listOf(
+        // ---------- Yüz temizleyiciler ----------
+        p("cerave_hydrating_cleanser", "Nemlendiren Temizleyici (Hydrating Cleanser)", "CeraVe", CLEANSER,
+            "Normal-kuru ve hassas ciltleri kurutmadan temizler; seramid ve hyaluronik asit içerir.",
+            "Islak yüze fındık kadar al, 30-60 sn masaj yap, ılık suyla durula.", "Günde 1-2 kez", Timing.BOTH,
+            "Göze kaçarsa bol suyla durula. $PATCH", listOf("lrp_toleriane_cleanser", "bioderma_sensibio_gel", "cetaphil_gentle")),
+        p("cerave_foaming_cleanser", "Köpüren Temizleyici (Foaming Cleanser)", "CeraVe", CLEANSER,
+            "Karma-yağlı ciltte fazla yağı alır, cildin bariyerini korur.", "Islak yüze uygula, köpürt, durula.", "Günde 1-2 kez", Timing.BOTH,
+            "Kuru ciltte sıkılık yapabilir; o zaman nemlendiren versiyonu tercih et.", listOf("lrp_effaclar_gel", "cerave_hydrating_cleanser")),
+        p("lrp_effaclar_gel", "Effaclar Arındırıcı Jel", "La Roche-Posay", CLEANSER,
+            "Yağlı ve sivilceye eğilimli ciltler için arındırıcı jel temizleyici.", "Islak yüze köpürterek uygula, durula.", "Günde 1-2 kez", Timing.BOTH,
+            "Aktif içeriklerle (retinoid) birlikte kullanırken kuruluk artarsa akşamları nemlendiren temizleyiciye geç.", listOf("cerave_foaming_cleanser")),
+        p("lrp_toleriane_cleanser", "Toleriane Caring Wash", "La Roche-Posay", CLEANSER,
+            "Hassas ciltler için nazik krem-jel temizleyici.", "Islak yüze uygula, masaj yap, durula.", "Günde 1-2 kez", Timing.BOTH,
+            PATCH, listOf("cerave_hydrating_cleanser")),
+        p("bioderma_sensibio_gel", "Sensibio Gel Moussant", "Bioderma", CLEANSER,
+            "Hassas ciltler için köpüren nazik temizleyici.", "Islak yüze köpürterek uygula, durula.", "Günde 1-2 kez", Timing.BOTH,
+            PATCH, listOf("cerave_hydrating_cleanser")),
+        p("cetaphil_gentle", "Gentle Skin Cleanser", "Cetaphil", CLEANSER,
+            "Bütçe dostu, çok nazik temizleyici.", "Islak veya kuru cilde uygula, durula ya da sil.", "Günde 1-2 kez", Timing.BOTH,
+            PATCH, listOf("cerave_hydrating_cleanser")),
+
+        // ---------- Nemlendiriciler ----------
+        p("cerave_pm_lotion", "PM Facial Moisturising Lotion", "CeraVe", MOISTURIZER,
+            "Hafif dokulu yüz nemlendiricisi; niasinamid ve seramid içerir. Gündüz de kullanılabilir.", "Temiz yüze fındık kadar sür.", "Günde 1-2 kez", Timing.BOTH,
+            "Retinoid kullanıyorsan önce nemlendirici (tampon yöntemi) tahrişi azaltabilir.", listOf("cerave_moist_cream", "neutrogena_hydroboost", "lrp_toleriane_sensitive")),
+        p("cerave_moist_cream", "Moisturising Cream (Nemlendirici Krem)", "CeraVe", MOISTURIZER,
+            "Kuru cilt için yoğun nemlendirici; yüz ve vücutta kullanılabilir.", "Az miktarda ısıtarak sür.", "Günde 1-2 kez", Timing.EVENING,
+            "Yağlı ciltte ağır gelebilir.", listOf("cerave_pm_lotion")),
+        p("neutrogena_hydroboost", "Hydro Boost Water Gel", "Neutrogena", MOISTURIZER,
+            "Yağlı/karma cilt için jel dokulu, hafif nemlendirici.", "Temiz yüze ince tabaka.", "Günde 1-2 kez", Timing.BOTH,
+            "Parfümlü versiyonlar hassas ciltte tahriş yapabilir. $PATCH", listOf("cerave_pm_lotion")),
+        p("lrp_toleriane_sensitive", "Toleriane Sensitive Krem", "La Roche-Posay", MOISTURIZER,
+            "Hassas ve kızarıklığa eğilimli cilt için yatıştırıcı nemlendirici.", "Sabah-akşam temiz cilde.", "Günde 1-2 kez", Timing.BOTH,
+            PATCH, listOf("cerave_pm_lotion")),
+        p("avene_cicalfate", "Cicalfate+ Onarıcı Krem", "Avène", MOISTURIZER,
+            "Tahriş olmuş, kurumuş bölgeler (ör. tıraş sonrası, retinoid kuruluğu) için onarıcı krem.", "Gerekli bölgeye ince tabaka.", "Gerektiğinde", Timing.AS_NEEDED,
+            "Açık yaralarda veya enfeksiyon belirtisinde hekime danış.", listOf("cerave_moist_cream")),
+
+        // ---------- Güneş koruyucular ----------
+        p("lrp_uvmune", "Anthelios UVMune 400 Invisible Fluid SPF50+", "La Roche-Posay", SUNSCREEN,
+            "Yüksek UVA/UVB koruması; hafif, iz bırakmayan doku.", "Rutinin son adımı; yüz + boyun için 2 parmak boyu. Dışarıdaysan 2-3 saatte bir yenile.", "Her sabah", Timing.MORNING,
+            "Göz çevresine dikkatli sür. Retinoid ve azelaik asit kullanırken güneş koruyucu atlanmamalı.", listOf("bioderma_photoderm", "avene_fluid50", "garnier_ambre_uv")),
+        p("bioderma_photoderm", "Photoderm Aquafluide SPF50+", "Bioderma", SUNSCREEN,
+            "Çok hafif, matlaştırıcı güneş koruyucu.", "Sabah son adım, 2 parmak kuralı.", "Her sabah", Timing.MORNING, PATCH, listOf("lrp_uvmune")),
+        p("avene_fluid50", "Very High Protection Fluid SPF50+", "Avène", SUNSCREEN,
+            "Hassas ciltler için hafif dokulu güneş koruyucu.", "Sabah son adım.", "Her sabah", Timing.MORNING, PATCH, listOf("lrp_uvmune")),
+        p("garnier_ambre_uv", "Ambre Solaire Super UV Yüz Fluidi SPF50", "Garnier", SUNSCREEN,
+            "Bütçe dostu yüz güneş koruyucusu.", "Sabah son adım.", "Her sabah", Timing.MORNING, PATCH, listOf("lrp_uvmune")),
+
+        // ---------- Cilt bakım / aktif ----------
+        p("to_azelaic", "Azelaic Acid Suspension 10%", "The Ordinary", SKIN_TREATMENT,
+            "Kızarıklık, ton eşitsizliği, sivilce izleri ve gözenek görünümü için yumuşak bir aktif.",
+            "Akşam, temizlenmiş kuru cilde bezelye kadar ince tabaka; ardından nemlendirici. Haftada 3 akşamla başla.", "Haftada 3 → tolere ederse günlük", Timing.EVENING,
+            "Hafif batma/kaşınma ilk haftalarda olabilir; belirgin kızarıklık veya yanma olursa bırak. İlk 2 hafta başka yeni aktif ekleme. Gündüz SPF şart. $PATCH",
+            listOf("to_niacinamide")),
+        p("to_niacinamide", "Niacinamide 10% + Zinc 1%", "The Ordinary", SKIN_TREATMENT,
+            "Yağlanma ve gözenek görünümünü dengelemeye yardımcı serum.", "Temizlikten sonra birkaç damla, ardından nemlendirici.", "Günde 1 kez", Timing.ANY,
+            "Yüksek konsantrasyon bazı ciltlerde kızarıklık yapabilir. $PATCH", listOf("to_azelaic")),
+        p("adapalene", "Adapalen %0,1 jel (retinoid)", "Çeşitli (ör. Differin)", SKIN_TREATMENT,
+            "Sivilce eğilimi ve cilt dokusu için retinoid. Türkiye'de reçeteli olarak satılabilir — dermatoloğa danışarak kullan.",
+            "Akşam, tamamen kuru temiz cilde tüm yüz için bezelye kadar. Haftada 2 akşamla başla, 2-3 haftada bir sıklığı artır.", "Haftada 2 → 3 → gün aşırı", Timing.EVENING,
+            "Kuruluk, soyulma ve geçici kötüleşme olabilir. Aynı akşam başka güçlü aktif (AHA/BHA, benzoil peroksit) kullanma. Gündüz SPF zorunlu. Hamilelik ihtimalinde kullanılmaz; hekime danış.",
+            listOf("to_azelaic")),
+        p("lrp_effaclar_duo", "Effaclar Duo+M", "La Roche-Posay", SKIN_TREATMENT,
+            "Sivilce eğilimli cilt için kusur görünümünü azaltan bakım kremi.", "Sabah veya akşam temiz cilde ince tabaka.", "Günde 1-2 kez", Timing.ANY,
+            "Retinoidle aynı anda başlatma. $PATCH", listOf("to_niacinamide")),
+
+        // ---------- Saç ----------
+        p("sm_curl_shine_shampoo", "Coconut & Hibiscus Curl & Shine Şampuan", "SheaMoisture", HAIR,
+            "Sülfatsız, bukleli saçı kurutmadan temizler.", "Sadece saç diplerine masajla uygula; boylara köpüğün akması yeterli. Durula.", "2-3 günde bir", Timing.MORNING,
+            "Kepek veya saç derisi sorunu varsa uygun şampuanla dönüşümlü kullan.", listOf("garnier_botanic_shampoo", "elseve_curl_shampoo")),
+        p("sm_curl_shine_conditioner", "Coconut & Hibiscus Curl & Shine Saç Kremi", "SheaMoisture", HAIR,
+            "Bukleleri nemlendirir, tarama kolaylığı sağlar.", "Boylara bol miktarda, parmaklarla açarak 2-3 dk beklet, hafif durula.", "Her yıkamada", Timing.MORNING,
+            "Saç diplerine sürme; ağırlaştırabilir.", listOf("garnier_hair_food")),
+        p("garnier_botanic_shampoo", "Botanic Therapy Şampuan", "Garnier", HAIR,
+            "Bütçe dostu günlük şampuan seçeneği.", "Saç diplerine masajla uygula, durula.", "2-3 günde bir", Timing.MORNING,
+            "Sülfat içeren versiyonlar bukleyi kurutabilir; içerik etiketini kontrol et.", listOf("sm_curl_shine_shampoo")),
+        p("elseve_curl_shampoo", "Elseve Dream Long Curls Şampuan", "L'Oréal Paris", HAIR,
+            "Dalgalı/kıvırcık saçlar için şampuan.", "Diplere uygula, durula.", "2-3 günde bir", Timing.MORNING, "", listOf("sm_curl_shine_shampoo")),
+        p("garnier_hair_food", "Fructis Hair Food Saç Maskesi (Muz)", "Garnier", HAIR,
+            "Haftalık yoğun nem bakımı; durulanan krem veya maske olarak kullanılabilir.", "Yıkamadan sonra boylara uygula, 3-5 dk beklet, durula.", "Haftada 1", Timing.MORNING,
+            "Çok fazla kullanmak saçı ağırlaştırabilir.", listOf("sm_curl_shine_conditioner")),
+        p("hs_classic", "Klasik Bakım Kepeğe Karşı Şampuan", "Head & Shoulders", HAIR,
+            "Kepek/kaşıntı olduğunda saç derisi için.", "Saç derisine uygula, 1-2 dk beklet, durula.", "Gerektiğinde, haftada 1-2", Timing.AS_NEEDED,
+            "Bukleli boyları kurutabilir; sadece saç derisine uygula ve ardından saç kremi kullan.", listOf("sm_curl_shine_shampoo")),
+        p("microfiber_towel", "Mikrofiber saç havlusu / pamuklu tişört", "Çeşitli", HAIR,
+            "Bukleleri bozmadan suyu almak ve kabarmayı azaltmak.", "Saçı ovmadan, havluyla aşağıdan yukarı sıkarak (scrunch) kurula.", "Her yıkamada", Timing.MORNING,
+            "Normal havluyla ovmak bukleleri bozar.", emptyList()),
+        p("satin_pillowcase", "Saten yastık kılıfı", "Çeşitli", HAIR,
+            "Gece sürtünmesini azaltarak bukleleri ve saç ucunu korur.", "Yastığa geçir; haftada bir yıka.", "Her gece", Timing.EVENING, "", emptyList()),
+        p("diffuser", "Fön makinesi difüzör başlığı", "Çeşitli", HAIR,
+            "Bukleleri dağıtmadan kurutmak.", "Düşük ısı/orta hız; saçı difüzörde avuçlayarak kurut.", "Yıkama günlerinde (isteğe bağlı)", Timing.MORNING,
+            "Yüksek ısı saçı kurutur; ısı koruyucu kullan.", emptyList()),
+
+        // ---------- Bukle belirginleştiriciler ----------
+        p("cantu_curling_cream", "Coconut Curling Cream", "Cantu", CURL,
+            "Bukle tanımı ve nem; kabarmayı azaltır.", "Islak saça avuç içinde ısıtarak bölüm bölüm uygula, sıkarak şekillendir.", "Her yıkamada + tazelemede az", Timing.MORNING,
+            "Fazla miktar saçı yağlı gösterebilir; ince saçta az kullan.", listOf("sm_curl_smoothie", "nym_curl_talk_cream")),
+        p("sm_curl_smoothie", "Curl Enhancing Smoothie", "SheaMoisture", CURL,
+            "Kalın/kıvırcık buklelerde tanım ve nem.", "Islak saça bölüm bölüm uygula.", "Her yıkamada", Timing.MORNING,
+            "Dalgalı ince saçta ağır gelebilir.", listOf("cantu_curling_cream")),
+        p("nym_curl_talk_cream", "Curl Talk Defining Cream", "Not Your Mother's", CURL,
+            "Hafif tutuşlu bukle tanımlayıcı krem.", "Islak saça uygula, sıkarak şekillendir.", "Her yıkamada", Timing.MORNING, "", listOf("cantu_curling_cream")),
+        p("curl_gel", "Bukle jeli (alkolsüz, hafif-orta tutuş)", "Çeşitli (ör. Not Your Mother's Curl Talk Gel)", CURL,
+            "Krem üzerine sürülünce bukle şeklini gün boyu sabitler.", "Kremden sonra ıslak saça; kuruyunca oluşan sert kabuğu (cast) avuçlayarak kır.", "Her yıkamada", Timing.MORNING,
+            "Alkol oranı yüksek jeller saçı kurutabilir.", listOf("cantu_curling_cream")),
+
+        // ---------- Sakal ----------
+        p("proraso_beard_wash", "Sakal Şampuanı (Wood & Spice)", "Proraso", BEARD,
+            "Sakal ve altındaki cildi temizler.", "Islak sakala az miktar, masaj, durula.", "Haftada 2-3", Timing.MORNING,
+            "Her gün kullanmak sakalı kurutabilir.", listOf("nivea_men_face_wash")),
+        p("proraso_beard_oil", "Sakal Yağı (Cypress & Vetyver)", "Proraso", BEARD,
+            "Sakalı yumuşatır, kaşıntı ve kepeklenmeyi azaltmaya yardımcı olur.", "2-4 damla avuçta ısıt, köke kadar yedir, tara.", "Her sabah", Timing.MORNING,
+            "Yağ ciltte sivilce yaparsa miktarı azalt.", listOf("proraso_beard_balm")),
+        p("proraso_beard_balm", "Sakal Balmı", "Proraso", BEARD,
+            "Yağa göre daha fazla şekil ve tutuş.", "Fındık kadar ısıt, sakala yay, tara.", "Gerektiğinde", Timing.MORNING, "", listOf("proraso_beard_oil")),
+        p("philips_beard_3000", "Sakal Kesme Makinesi Series 3000", "Philips", BEARD,
+            "Sakal boyunu eşitlemek ve hattı düzeltmek.", "Kuru sakalda, uzun taraktan başlayarak kısalt. Hat için tarağı çıkar.", "Haftada 1", Timing.EVENING,
+            "Bıçakları her kullanımdan sonra temizle.", listOf("philips_oneblade")),
+        p("philips_oneblade", "OneBlade", "Philips", BEARD,
+            "Hat düzeltme, kısa sakal ve tıraş için tek cihaz.", "Kuru veya ıslak kullanılabilir; tarakla boy ayarla.", "Haftada 1-2", Timing.EVENING,
+            "Bıçak ömrü sınırlıdır; yedek bıçak maliyetini hesaba kat.", listOf("philips_beard_3000")),
+        p("beard_comb", "Ahşap sakal tarağı", "Çeşitli", BEARD,
+            "Sakalı şekillendirmek ve ürünü eşit dağıtmak.", "Yağ veya balmdan sonra tara.", "Her gün", Timing.MORNING, "", emptyList()),
+        p("nivea_men_face_wash", "Men Sensitive Yüz Yıkama Jeli", "NIVEA Men", BEARD,
+            "Hassas erkek cildi ve sakal bölgesi için temizleyici.", "Islak yüze köpürterek uygula.", "Günde 1-2", Timing.BOTH, PATCH, listOf("cerave_hydrating_cleanser")),
+
+        // ---------- Diş & ağız ----------
+        p("oralb_vitality", "Vitality Pro Şarjlı Diş Fırçası", "Oral-B", ORAL,
+            "Düzenli ve eşit fırçalama; zamanlayıcı ile 2 dakika.", "Her dişte 2-3 sn bekle, bastırma; diş eti hattına 45°.", "Günde 2", Timing.BOTH,
+            "Başlığı 3 ayda bir değiştir.", listOf("manual_soft_brush")),
+        p("manual_soft_brush", "Yumuşak kıllı manuel diş fırçası", "Çeşitli (ör. Colgate, Oral-B)", ORAL,
+            "Bütçe dostu etkili seçenek.", "2 dk nazik dairesel hareket.", "Günde 2", Timing.BOTH, "Sert kıl diş eti ve mineyi yıpratabilir. 3 ayda bir değiştir.", listOf("oralb_vitality")),
+        p("sensodyne_repair", "Onarım & Koruma Diş Macunu", "Sensodyne", ORAL,
+            "Florürlü; hassasiyete karşı.", "Bezelye kadar macun; fırçaladıktan sonra tükür, çalkalama.", "Günde 2", Timing.BOTH,
+            "Uzun süreli hassasiyet veya ağrıda diş hekimine git.", listOf("colgate_total")),
+        p("colgate_total", "Total Diş Macunu", "Colgate", ORAL,
+            "Florürlü genel koruma macunu.", "Bezelye kadar, 2 dk.", "Günde 2", Timing.BOTH, "", listOf("sensodyne_repair")),
+        p("oralb_essential_floss", "Essential Floss Diş İpi", "Oral-B", ORAL,
+            "Diş aralarındaki plağı temizler; diş eti sağlığı ve nefes için önemlidir.", "40 cm ip, her diş arasında C şeklinde sarıp yukarı-aşağı.", "Günde 1 (akşam)", Timing.EVENING,
+            "İlk günlerde hafif kanama olabilir; 1-2 haftada geçmezse diş hekimine danış.", listOf("interdental_brush")),
+        p("interdental_brush", "Arayüz fırçası", "Çeşitli (ör. TePe, Oral-B)", ORAL,
+            "Geniş diş araları veya diş teli için diş ipine alternatif.", "Uygun boyutu seç, zorlamadan ileri-geri.", "Günde 1", Timing.EVENING, "Boyutu diş hekiminle belirle.", listOf("oralb_essential_floss")),
+        p("tongue_scraper", "Dil temizleyici (paslanmaz çelik)", "Çeşitli", ORAL,
+            "Dil yüzeyindeki birikintiyi azaltarak nefes tazeliğine yardımcı olur.", "Arkadan öne nazikçe 3-4 kez çek, durula.", "Günde 1", Timing.EVENING, "Bastırma; tahriş yapabilir.", emptyList()),
+        p("listerine_zero", "Total Care Zero (alkolsüz) Gargara", "Listerine", ORAL,
+            "Fırçalama ve diş ipine ek olarak ağız hijyeni.", "20 ml, 30 sn çalkala; fırçalamadan farklı bir saatte kullan.", "Günde 1 (isteğe bağlı)", Timing.ANY,
+            "Fırçalamanın yerine geçmez. Yutma.", emptyList()),
+
+        // ---------- El & tırnak ----------
+        p("neutrogena_hand", "Norveç Formülü El Kremi", "Neutrogena", HAND_NAIL,
+            "Kuru, çatlamış eller için yoğun bakım.", "Bezelye kadar, özellikle yıkama sonrası ve gece.", "Günde 1-3", Timing.ANY, "", listOf("cerave_moist_cream")),
+        p("nail_kit", "Tırnak makası + törpü seti", "Çeşitli", HAND_NAIL,
+            "Temiz, düzgün tırnaklar.", "Düz kes, köşeleri törpüyle yuvarla; ayak tırnaklarını düz kes.", "Haftada 1", Timing.EVENING,
+            "Batık tırnak riskine karşı ayak tırnaklarını çok kısa ve oval kesme.", emptyList()),
+
+        // ---------- Vücut ----------
+        p("cerave_body_lotion", "Moisturising Lotion (Vücut Losyonu)", "CeraVe", BODY,
+            "Duş sonrası vücut nemlendirme; kokusuz.", "Hafif nemli cilde duş sonrası uygula.", "Günde 1", Timing.EVENING, "", listOf("nivea_body_lotion")),
+        p("nivea_body_lotion", "Nemlendirici Vücut Losyonu", "NIVEA", BODY, "Bütçe dostu vücut nemlendirici.", "Duş sonrası.", "Günde 1", Timing.EVENING, "", listOf("cerave_body_lotion")),
+        p("dove_men_shower", "Men+Care Duş Jeli", "Dove", BODY,
+            "Nazik vücut temizliği.", "Lif veya avuçla köpürt, durula.", "Günlük", Timing.ANY, "", listOf("nivea_men_shower")),
+        p("nivea_men_shower", "Men Duş Jeli", "NIVEA Men", BODY, "Günlük vücut temizliği.", "Köpürt, durula.", "Günlük", Timing.ANY, "", listOf("dove_men_shower")),
+        p("hamam_kesesi", "Hamam kesesi / peeling eldiveni", "Çeşitli", BODY,
+            "Ölü deriyi alarak pürüzsüz cilt, batık kıl önleme.", "Islak ve ısınmış cilde nazikçe, tek yönde.", "Haftada 1", Timing.EVENING,
+            "Yüzde kullanma; tahrişli/yaralı ciltte uygulama.", emptyList()),
+
+        // ---------- Parfüm & hijyen ----------
+        p("rexona_men", "Men Antiperspirant", "Rexona", FRAGRANCE,
+            "Ter ve koku kontrolü.", "Temiz kuru koltuk altına; gece uygulamak etkisini artırabilir.", "Günde 1", Timing.MORNING, "Tahriş olursa farklı formül dene.", listOf("nivea_men_deo")),
+        p("nivea_men_deo", "Men Black & White Invisible Deodorant", "NIVEA Men", FRAGRANCE,
+            "Kıyafette leke bırakmayan antiperspirant.", "Temiz kuru cilde.", "Günde 1", Timing.MORNING, "", listOf("rexona_men")),
+        p("davidoff_cool_water", "Cool Water EDT", "Davidoff", FRAGRANCE,
+            "Ferah, temiz, akuatik koku; günlük kullanım için klasik.", "Boyun ve bileklere 2-3 sıkım; ovma.", "Günlük", Timing.MORNING,
+            "Satın almadan önce mağazada ten üzerinde test et.", listOf("versace_pour_homme", "ck_one")),
+        p("versace_pour_homme", "Pour Homme EDT", "Versace", FRAGRANCE,
+            "Narenciye-aromatik, temiz ve modern koku.", "2-3 sıkım.", "Günlük", Timing.MORNING, "Ten üzerinde test et.", listOf("davidoff_cool_water")),
+        p("ck_one", "CK One EDT", "Calvin Klein", FRAGRANCE,
+            "Hafif, temiz, uniseks günlük koku.", "2-4 sıkım.", "Günlük", Timing.MORNING, "", listOf("davidoff_cool_water")),
+        p("lip_balm", "Dudak bakım kremi (SPF'li)", "Çeşitli (ör. Bioderma Atoderm, NIVEA)", FRAGRANCE,
+            "Kuru dudaklara bakım ve güneş koruması.", "Gerektiğinde ince tabaka.", "Gerektiğinde", Timing.AS_NEEDED, "", emptyList()),
+
+        // ---------- Spor ekipmanı ----------
+        p("adj_dumbbell", "Ayarlanabilir dambıl seti (2 × 10-20 kg)", "Çeşitli (ör. Domyos / Decathlon)", SPORT,
+            "Evde çoğu hareketi (yana açış, row, press, RDL, goblet squat) yapmak için temel ekipman.", "Plakaları kilitlediğinden emin ol; hareket başına uygun ağırlık seç.", "Antrenman günleri", Timing.WORKOUT,
+            "Kilit mekanizmasını her setten önce kontrol et.", listOf("resistance_bands")),
+        p("resistance_bands", "Direnç bandı seti", "Çeşitli (ör. Domyos / Decathlon)", SPORT,
+            "Ucuz ve taşınabilir; face pull, yana açış, barfiks desteği için.", "Bandı sağlam bir noktaya sabitle; çatlak bant kullanma.", "Antrenman günleri", Timing.WORKOUT,
+            "Bantları güneşte bırakma; yıpranırsa değiştir.", listOf("adj_dumbbell")),
+        p("door_pullup_bar", "Kapı barfiks barı", "Çeşitli", SPORT,
+            "Kanat kası (V-taper) için en etkili ev ekipmanı.", "Kapı pervazına montaj talimatına göre tak, ilk kullanımda yük testi yap.", "Antrenman günleri", Timing.WORKOUT,
+            "Pervazın sağlamlığından emin ol; maksimum taşıma kapasitesine dikkat et.", emptyList()),
+        p("adj_bench", "Ayarlanabilir bench", "Çeşitli", SPORT,
+            "Eğimli press (üst göğüs) ve destekli row için.", "Kilit pimlerini kontrol et; 30° eğim üst göğüs için idealdir.", "Antrenman günleri", Timing.WORKOUT, "", emptyList()),
+        p("yoga_mat", "Egzersiz/yoga matı", "Çeşitli (ör. Domyos / Decathlon)", SPORT,
+            "Core ve mobilite çalışmaları için.", "Kaymaz yüzeyi alta gelecek şekilde ser.", "Günlük", Timing.ANY, "", emptyList()),
+        p("jump_rope", "Atlama ipi", "Çeşitli", SPORT,
+            "Kısa, etkili kondisyon çalışması.", "1 dk atla / 1 dk dinlen × 8-10.", "Haftada 2-3", Timing.ANY, "Diz/ayak bileği şikayetinde yürüyüşü tercih et.", emptyList()),
+        p("foam_roller", "Foam roller", "Çeşitli", SPORT,
+            "Toparlanma ve kas gerginliğinde rahatlama hissi.", "Her bölgede 30-60 sn yavaşça yuvarlan.", "Gerektiğinde", Timing.AS_NEEDED, "Bel bölgesinde ve eklem üstünde kullanma.", emptyList()),
+
+        // ---------- Besin destekleri ----------
+        p("creatine", "Kreatin Monohidrat", "Çeşitli (ör. Hardline, Bigjoy, Optimum Nutrition)", ProductCategory.SUPPLEMENT,
+            "Kuvvet ve antrenman performansını desteklediği en çok araştırılmış takviyelerden biri.",
+            "Genel kullanım bilgisi: günde 3-5 g, her gün aynı saatte; su veya yemekle. Yükleme fazı gerekli değildir.", "Her gün", Timing.ANY,
+            "Böbrek hastalığı veya düzenli ilaç kullanımı varsa önce hekime danış. Bol su iç. Saf monohidrat yeterlidir; karışımlara gerek yok.",
+            emptyList(), dailyTracking = true, dose = "3-5 g"),
+        p("whey", "Whey Protein Tozu", "Çeşitli (ör. Hardline, Bigjoy, Optimum Nutrition)", ProductCategory.SUPPLEMENT,
+            "Yalnızca yemeklerle protein hedefine ulaşılamadığında pratik bir alternatif. Zorunlu değildir.",
+            "1 ölçek (~25-30 g) su veya sütle; günün herhangi bir saati, genelde antrenman sonrası veya ara öğün.", "Gerektiğinde, günde 1", Timing.WORKOUT,
+            "Laktoz hassasiyetinde izolat tercih edilebilir. Gerçek yemeklerin yerine geçirme.",
+            emptyList(), dailyTracking = true, dose = "1 ölçek"),
+        p("omega3", "Omega-3 (balık yağı)", "Çeşitli (ör. Ocean, Solgar)", ProductCategory.SUPPLEMENT,
+            "Haftada 2 porsiyon yağlı balık yemiyorsan değerlendirilebilecek bir destek.",
+            "Ürün etiketindeki doz; yemekle birlikte.", "Etikete göre", Timing.ANY,
+            "Kan sulandırıcı kullanıyorsan veya ameliyat öncesindeysen hekime danış. Balığı düzenli yiyorsan gerekmeyebilir.",
+            emptyList(), dailyTracking = true, dose = "Etikete göre"),
+        p("vitamin_d", "D3 Vitamini", "Çeşitli (ör. Solgar, Ocean)", ProductCategory.SUPPLEMENT,
+            "Güneşe az çıkıyorsan gündeme gelebilir. İhtiyaç kişiden kişiye değişir; en doğrusu kan testi ve hekim değerlendirmesidir.",
+            "Yağ içeren bir öğünle. Doz için hekime veya eczacıya danış.", "Hekim önerisine göre", Timing.MORNING,
+            "Yüksek doz uzun süre kullanılmamalı; fazlası vücutta birikebilir. Teşhis ve doz için hekime danış.",
+            emptyList(), dailyTracking = true, dose = "Hekim önerisine göre"),
+        p("magnesium", "Magnezyum (sitrat veya bisglisinat)", "Çeşitli (ör. Solgar, Ocean)", ProductCategory.SUPPLEMENT,
+            "Beslenmesi yetersiz olanlar için değerlendirilebilir; bazı kişiler akşam kullanmayı tercih eder.",
+            "Etiketteki doz; akşam yemekle.", "Etikete göre", Timing.EVENING,
+            "Fazlası ishal yapabilir. Böbrek sorunu veya ilaç kullanımı varsa hekime danış.",
+            emptyList(), dailyTracking = true, dose = "Etikete göre"),
+    )
+}
